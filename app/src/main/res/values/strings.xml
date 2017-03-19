@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Google Books</string>
+    <string name="search">Search</string>
+    <string name="no_record">No Books Found!!</string>
+    <string name="try_again">Why don\'t you try new search again?</string>
+    <string name="no">NO</string>
+    <string name="yes">YES</string>
+    <string name="search_books">Search Books</string>
+</resources>
