@@ -29,18 +29,27 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import static android.R.id.list;
+
 public class MainActivity extends AppCompatActivity {
 
     private String userInput = null;
     private String searchUrl = "https://www.googleapis.com/books/v1/volumes?q=";
-
+    ArrayList<BookInfo> bookList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final boolean networkStatus = checkNetwork();
+        if(savedInstanceState == null || !savedInstanceState.containsKey("key")) {
+            //DO Nothing
+        }
+        else {
+            bookList = savedInstanceState.getParcelableArrayList("key");
+        }
+
+
         Button search = (Button) findViewById(R.id.search_button);
 
         search.setOnClickListener(new View.OnClickListener() {
@@ -49,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout listLayout = (LinearLayout) findViewById(R.id.search_results);
                 listLayout.setVisibility(View.INVISIBLE);
                 userInput = ((EditText) findViewById(R.id.book_search)).getText().toString().replace(" ", "");
-                if (networkStatus) {
+                if (checkNetwork()) {
                     if (userInput.equals("")) {
                         Toast.makeText(MainActivity.this, "Please Enter Book Name!!", Toast.LENGTH_SHORT).show();
                     } else {
@@ -78,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("key", bookList);
+        super.onSaveInstanceState(outState);
     }
 
     /**
@@ -132,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             return bookDetails;
         }
 
+
         @Override
         protected void onPostExecute(ArrayList<BookInfo> bookDetails) {
             dialog.dismiss();
@@ -141,10 +157,11 @@ public class MainActivity extends AppCompatActivity {
         public void updateList(ArrayList<BookInfo> bookDetails) {
             LinearLayout listLayout = (LinearLayout) findViewById(R.id.search_results);
             listLayout.setVisibility(View.VISIBLE);
-            if(bookDetails != null && bookDetails.size() > 0) {
+            bookList = bookDetails;
+            if(bookList != null && bookList.size() > 0) {
                 TextView norecords = (TextView) findViewById(R.id.result_textview);
                 norecords.setVisibility(View.INVISIBLE);
-                BookInfoAdapter bookInfoAdapter = new BookInfoAdapter(MainActivity.this, bookDetails);
+                BookInfoAdapter bookInfoAdapter = new BookInfoAdapter(MainActivity.this, bookList);
                 ListView listView = (ListView) findViewById(R.id.listViewID);
                 listView.setAdapter(bookInfoAdapter);
             }

@@ -1,7 +1,10 @@
 package com.udacity.ranjitha.googlebooks;
 
 
-public class BookInfo {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class BookInfo implements Parcelable {
 
     private String bookTitle;
 
@@ -14,6 +17,11 @@ public class BookInfo {
 
     }
 
+    private BookInfo(Parcel in) {
+        bookTitle = in.readString();
+        author = in.readString();
+    }
+
     public String getBookTitle() {
         return bookTitle;
     }
@@ -23,4 +31,24 @@ public class BookInfo {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(bookTitle);
+        parcel.writeString(author);
+    }
+
+    public static final Parcelable.Creator<BookInfo> CREATOR = new Parcelable.Creator<BookInfo>() {
+        public BookInfo createFromParcel(Parcel in) {
+            return new BookInfo(in);
+        }
+
+        public BookInfo[] newArray(int size) {
+            return new BookInfo[size];
+        }
+    };
 }
